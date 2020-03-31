@@ -178,4 +178,15 @@ class LineDraw(ctx: Context, attr: AttributeSet? = null) : View(ctx, attr) {
         lineArrayList.clear()
         invalidate()
     }
+
+    fun recalculateLineUsingAccelerometer(x: Float, y: Float) {
+        lineArrayList.forEachIndexed { index, linePoint ->
+            linePoint.startCoordinate.x+=x
+            linePoint.startCoordinate.y+=y
+            linePoint.endCoordinate.x+=x
+            linePoint.endCoordinate.y+=y
+            lineArrayList.set(index, linePoint)
+        }
+        invalidate()
+    }
 }

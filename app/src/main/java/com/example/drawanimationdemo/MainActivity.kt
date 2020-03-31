@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                     action = Constants.GO
                     actionButton.text = action
                     LineDraw.editMode = true
+                    stopSensorManually()
                     Toast.makeText(this, "EDIT MODE", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -61,11 +62,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
          */
         if(!LineDraw.editMode) {
             sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-            accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY)
+            accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
             sensorManager.registerListener(
                 this,
                 accelerometerSensor,
-                SensorManager.SENSOR_DELAY_FASTEST
+                SensorManager.SENSOR_DELAY_NORMAL
             )
         }
     }
@@ -88,6 +89,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         var y = event.values[1] - gravityV[1];
         var z = event.values[2] - gravityV[2];
 
+        // Method to recalculate the Point of each line in the line array
+        LineDraw.recalculateLineUsingAccelerometer(x, y)
+
         Log.i("rew", "x: ${event!!.values[0]} y: ${event.values[1]} z: ${event.values[2]}")
 
         Log.i(ContentValues.TAG, "Accelerometer -> x=$x and y=$y, z=$z")
@@ -105,4 +109,22 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }
         actionButtonAnimateObject.start()
     }
+
+/*
+    override fun onResume() {
+        super.onResume()
+        sensorManager!!.registerListener(this,accelerometerSensor,
+            SensorManager.SENSOR_DELAY_NORMAL)
+    }
+*/
+
+    override fun onPause() {
+        super.onPause()
+        sensorManager!!.unregisterListener(this, accelerometerSensor)
+    }
+
+    fun stopSensorManually() {
+        sensorManager!!.unregisterListener(this, accelerometerSensor)
+    }
+
 }
